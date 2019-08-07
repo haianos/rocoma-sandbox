@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package format="2">
+
+  <name>rocomaex_lua_ctrl</name>
+  <version>0.1.0</version>
+  <description>Example of rocoma controller (interface) in Lua</description>
+  <maintainer email="enea.scioni@gmail.com">Enea Scioni</maintainer>
+  <license>MIT</license>
+  <author email="enea.scioni@gmail.com">Enea Scioni</author>
+  <url>https://github.com/haianos/rocoma-sandbox</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roco</depend>
+  <depend>rocomaex_model</depend>
+  <depend>message_logger</depend>
+  <depend>roco_ros</depend>
+  <depend>rocoma_plugin</depend>
+
+  <export>
+    <rocoma_plugin plugin="${prefix}/rocoma_plugin.xml"/>
+  </export>
+
+</package>

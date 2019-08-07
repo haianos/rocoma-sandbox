@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <!-- Debug with gbd or valgrind -->
+    <arg name="debug" default="" />
+
+    <env name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find scriptctrl_example)/rosconsole.conf"/>
+    
+    <node pkg="scriptctrl_example" type="scriptctrl_example_exec" name="scriptctrl_example_exec"
+        output="screen" launch-prefix="$(arg debug)">
+        <rosparam file="$(find scriptctrl_example)/param/default_parameters.yaml" command="load" />
+        <rosparam file="$(find scriptctrl_example)/param/default_publishers.yaml" command="load" />
+        <rosparam file="$(find scriptctrl_example)/param/default_subscribers.yaml" command="load" />
+        <rosparam file="$(find scriptctrl_example)/param/default_services.yaml" command="load" />
+    </node>
+
+</launch>

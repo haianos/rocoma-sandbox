@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library path="lib/librocomaex_lua_ctrl_plugin">
+  <class type="LuaController" base_class_type="rocoma_plugin::ControllerRosPluginInterface<rocomaex_model::RocoState, rocomaex_model::RocoCommand>">
+  </class>
+</library>

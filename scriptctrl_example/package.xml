@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>scriptctrl_example</name>
+  <version>0.1.0</version>
+  <description>Scriptctrl example</description>
+  <maintainer email="enea.scioni@gmail.com">Enea Scioni</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/haianos/rocoma-sandbox</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>any_node</depend>
+  <depend>rocoma_ros</depend>
+  <depend>roco</depend>
+  <depend>message_logger</depend>
+  <depend>rocomaex_model</depend>
+<!--  <depend>rocomaex_failproof_ctrl1</depend>
+  <depend>rocomaex_emgcy_ctrl1</depend>
+  <depend>rocomaex_emgcy_ctrl2</depend>
+  <depend>rocomaex_ros_emgcy_ctrl1</depend>
+  <depend>rocomaex_ctrl1</depend>
+  <depend>rocomaex_ctrl2</depend>
+  <depend>rocomaex_ros_ctrl1</depend>-->
+
+</package>

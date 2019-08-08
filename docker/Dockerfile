@@ -38,8 +38,10 @@ RUN cd ${WORKDIR}/src &&\
     git clone https://github.com/ANYbotics/message_logger &&\
     git clone https://github.com/ANYbotics/any_node &&\
     git clone https://github.com/ANYbotics/variant &&\
-    git clone https://github.com/haianos/rocoma-sandbox
 
+RUN cd ${WORKDIR}/src &&\
+    git clone https://github.com/haianos/rocoma-sandbox
+    
 RUN . /opt/ros/kinetic/setup.sh &&\
     cd ${WORKDIR}/src && catkin_init_workspace &&\
     cd ${WORKDIR} && catkin_make_isolated

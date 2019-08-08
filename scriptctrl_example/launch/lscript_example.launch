@@ -9,6 +9,7 @@
     
     <node pkg="scriptctrl_example" type="scriptctrl_example_exec" name="scriptctrl_example_exec"
         output="screen" launch-prefix="$(arg debug)">
+        <rosparam param="lua_controller_path">"/home/haianos/anybotics/src/haianos/scriptctrl_example/controllers"</rosparam>
         <rosparam file="$(find scriptctrl_example)/param/default_parameters.yaml" command="load" />
         <rosparam file="$(find scriptctrl_example)/param/default_publishers.yaml" command="load" />
         <rosparam file="$(find scriptctrl_example)/param/default_subscribers.yaml" command="load" />

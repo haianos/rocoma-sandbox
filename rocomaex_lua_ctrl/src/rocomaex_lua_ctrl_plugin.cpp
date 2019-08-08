@@ -1,13 +1,13 @@
 /*!
 * @file 	  rocomaex_lua_cltr_plugin.cpp
 * @author   Enea Scioni
-* @date		  09/09/2019
+* @date		  09/08/2019
 * @version 	0.1
 * @brief    Plugin export for controller LuaController
 */
 
 // state and command
-#include "rocomaex_model/RocoState.hpp"
+#include "rocomaex_lua_ctrl/RocoState.hpp"
 #include "rocomaex_model/RocoCommand.hpp"
 
 // rocomaex_ros_ctrl1

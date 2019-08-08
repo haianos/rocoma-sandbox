@@ -12,6 +12,7 @@
 // logger
 #include <message_logger/message_logger.hpp>
 
+
 #define luaM_checkudata_bx(L, pos, T) (T**) (luaL_checkudata((L), (pos), #T))
 
 #define get_lua_cltr \
@@ -27,10 +28,9 @@ LuaController::~LuaController() {
 
 bool LuaController::create(double dt) {
   ros::NodeHandle nh = this->getNodeHandle();
-  std::string path;
-  nh.param<std::string>("lua_controller_path", path, "/home/user/ws/src/rocoma-sandbox/scriptctrl_example/controllers");
-  std::cout << path << std::endl;
-  this->executeFile(path+"/"+this->getName()+".lua");
+  nh.param<std::string>("lua_controller_path", _path, "/home/user/ws/src/rocoma-sandbox/scriptctrl_example/controllers");
+  _pub_cmd = nh.advertise<std_msgs::Float64>(this->getName()+"/cmd",1);
+  this->executeFile(_path+"/"+this->getName()+".lua");
   MELO_INFO_STREAM("Controller " << this->getName() << " is created!");
   return true;
 }
@@ -56,6 +56,7 @@ bool LuaController::stop() {
 }
 
 bool LuaController::cleanup() {
+  _pub_cmd.shutdown();
   return callControllerStep("cleanup");
 }
 
@@ -70,6 +71,10 @@ bool LuaController::getSwapState(roco::ControllerSwapStateInterfacePtr& swapStat
 
 bool LuaController::addSharedModule(const roco::SharedModulePtr& module) {
   return false;
+}
+
+void LuaController::sendCmd(const std_msgs::Float64& msg) {
+  _pub_cmd.publish(msg);
 }
 
 int LuaController::executeFile(const std::string &name) {
@@ -202,7 +207,6 @@ static const struct luaL_Reg logreg[] = {
  {NULL, NULL}
 };
 
-// gen_push_bxptr(TaskContext_push, "TaskContext", TaskContext)
 
 static int getCtrl(lua_State *L)
 {
@@ -212,6 +216,64 @@ static int getCtrl(lua_State *L)
 }
 
 using namespace rocomaex_lua_ctrl;
+using namespace rocomaex_model;
+
+
+static int RocoCommand_getValue(lua_State *L) {
+  RocoCommand *cmd;
+  cmd = *(luaM_checkudata_bx(L,1,RocoCommand));
+  lua_pushnumber(L,cmd->getValue());
+  return 1;
+}
+
+static int RocoState_getValue(lua_State *L) {
+  RocoState *state;
+  state = *(luaM_checkudata_bx(L,1,RocoState));
+  lua_pushnumber(L,state->getValue());
+  return 1;
+}
+
+static int RocoCommand_setValue(lua_State *L) {
+  RocoCommand *cmd;
+  cmd = *(luaM_checkudata_bx(L,1,RocoCommand));
+  double value = luaL_checknumber(L,2);
+  cmd->setValue(value);
+  return 0;
+}
+
+static int RocoState_setValue(lua_State *L) {
+  RocoState *state;
+  state = *(luaM_checkudata_bx(L,1,RocoState));
+  double value = luaL_checknumber(L,2);
+  state->setValue(value);
+  return 0;
+}
+
+
+int luaopen_modelmodule(lua_State *L) {
+  static const struct luaL_Reg rococommand[] = {
+   {"getValue",  RocoCommand_getValue},
+   {"setValue",  RocoCommand_setValue},
+   {NULL, NULL}
+  };
+  
+  static const struct luaL_Reg rocostate[] = {
+   {"getValue",  RocoState_getValue},
+   {"setValue",  RocoState_setValue},
+   {NULL, NULL}
+  };
+  
+  luaL_newmetatable(L,"RocoCommand");
+  lua_pushvalue(L,-1);
+  lua_setfield(L,-2,"__index");
+  luaL_setfuncs(L,rococommand,0);
+  
+  luaL_newmetatable(L,"RocoState");
+  lua_pushvalue(L,-1);
+  lua_setfield(L,-2,"__index");
+  luaL_setfuncs(L,rocostate,0);
+  return 0;
+}
 
 static int LuaController_getName(lua_State *L) {
   const char *s;
@@ -232,12 +294,49 @@ static int LuaController_isInitialized(lua_State *L) {
   return 1;
 }
 
+static int LuaController_getState(lua_State* L) {
+  LuaController *lc;
+  RocoState **state;
+  getCtrl(L);
+  lc     = *(luaM_checkudata_bx(L, -1, LuaController));
+  state  = (RocoState**)lua_newuserdata(L,sizeof(RocoState*));
+  *state = (RocoState*)&(lc->getState());
+  luaL_getmetatable(L,"RocoState");
+  lua_setmetatable(L,-2);
+  return 1;
+}
+
+static int LuaController_getCommand(lua_State* L) {
+  LuaController *lc;
+  RocoCommand **cmd;
+  getCtrl(L);
+  lc   = *(luaM_checkudata_bx(L, -1, LuaController));
+  cmd  = (RocoCommand**)lua_newuserdata(L,sizeof(RocoCommand*));
+  *cmd = (RocoCommand*)(&lc->getCommand());
+  luaL_getmetatable(L,"RocoCommand");
+  lua_setmetatable(L,-2);
+  return 1;
+}
+
+static int LuaController_publish(lua_State* L) {
+  LuaController *lc;
+  getCtrl(L);
+  lc   = *(luaM_checkudata_bx(L, -1, LuaController));
+  std_msgs::Float64 msg;
+  msg.data = luaL_checknumber(L,1);
+  lc->sendCmd(msg);
+  return 0;
+}
+
 static const struct luaL_Reg lcmodreg[] = {
   {"isInitialized", LuaController_isInitialized},
 //   {"getName", LuaController_isCreated},
 //   {"getName", LuaController_isRunning},
-  {"getName", LuaController_getName},
-  {"getCtrl", getCtrl},
+  {"getName",    LuaController_getName},
+  {"getCtrl",    getCtrl},
+  {"getState",   LuaController_getState},
+  {"getCommand", LuaController_getCommand},
+  {"pubCmd",     LuaController_publish},
   {NULL, NULL}
 };
 
@@ -252,39 +351,6 @@ int luaopen_lcmodule(lua_State *L) {
   luaL_newlib(L,lcmodreg);
   return 1;
 }
-
-
-// /* Those are from ControllerManager Class */
-// 
-// static int getCM(lua_State *L)
-// {
-// 	lua_pushstring(L, "this_CM");
-// 	lua_rawget(L, LUA_REGISTRYINDEX);
-// 	return 1;
-// }
-// 
-// 
-// static int Controller_getActiveControllerName(lua_State *L) {
-//   LuaController::Base *ctrl;
-//   getCM(L);
-//   ctrl = *(luaM_checkudata_bx(L, -1, LuaController::Base));
-// //   std::cout << ctrl->getActiveControllerName() << std::endl;
-// //   std::string str(lc->getActiveControllerName());
-// //   lua_pushboolean(L,ret ? 1 : 0 );
-//   return 1;
-// }
-// 
-// static const struct luaL_Reg ctrlmodreg[] = {
-//   {"getActiveControllerName",Controller_getActiveControllerName},
-//   {NULL,NULL}
-// };
-// 
-// int luaopen_ctrlmodule(lua_State *L) {
-//   luaL_newmetatable(L,"LuaController::Base");
-//   luaL_newlib(L,ctrlmodreg);
-//   return 1;
-// }
-
 
 namespace rocomaex_lua_ctrl {
   
@@ -304,6 +370,7 @@ namespace rocomaex_lua_ctrl {
     lua_setglobal(L,"log");
     luaopen_lcmodule(L);
     lua_setglobal(L,"lcmod");
+    luaopen_modelmodule(L);
   }
 
 }

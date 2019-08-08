@@ -29,6 +29,8 @@ ENV WORKDIR "/home/$UNAME/ws"
 
 # Fetching and installing sources
 RUN cd ${WORKDIR}/src &&\
+    git clone https://github.com/ANYbotics/kindr &&\
+    git clone https://github.com/ANYbotics/kindr_ros &&\
     git clone https://github.com/ANYbotics/roco &&\
     git clone https://github.com/ANYbotics/rocoma &&\
     git clone https://github.com/ANYbotics/rocoma_example &&\

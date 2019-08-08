@@ -87,7 +87,7 @@ bool ScriptCtrl::init()
     LuaGeneric.first.pluginName_    = "LuaController";
     LuaGeneric.first.name_          = "LuaGeneric1";
     LuaGeneric.first.isRos_         = true;
-    LuaGeneric.first.parameterPath_ = "param/luageneric.xml";
+    LuaGeneric.first.parameterPath_ = "/home/haianos/anybotics/src/haianos/scriptctrl_example/controllers";
     
     //second --> NONE, failback to generic failproof controller
     

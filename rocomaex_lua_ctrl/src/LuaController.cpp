@@ -1,7 +1,7 @@
 /*!
 * @file 	  LuaController.cpp
 * @author   Enea Scioni
-* @date		  09/09/2019
+* @date		  09/08/2019
 * @version 	0.1
 * @brief    Lua Controller Example for rocoma
 */
@@ -26,45 +26,41 @@ LuaController::~LuaController() {
 }
 
 bool LuaController::create(double dt) {
+  ros::NodeHandle nh = this->getNodeHandle();
+  std::string path;
+  nh.param<std::string>("lua_controller_path", path, "/home/user/ws/src/rocoma-sandbox/scriptctrl_example/controllers");
+  std::cout << path << std::endl;
+  this->executeFile(path+"/"+this->getName()+".lua");
   MELO_INFO_STREAM("Controller " << this->getName() << " is created!");
   return true;
 }
 
 bool LuaController::initialize(double dt) {
-  std::cout << "PARAM PATH is: " << this->getParameterPath() << std::endl;
-  this->executeFile("/home/haianos/anybotics/generic-controller.lua");
-  callControllerStep("initialize");
-  return true;
+  return callControllerStep("initialize");
 }
 
 bool LuaController::advance(double dt) {
-  MELO_INFO_THROTTLE_STREAM(1.0, "Controller " << this->getName() << " is advanced!");
-  return true;
+  return callControllerStep("advance",dt);
 }
 
 bool LuaController::reset(double dt) {
-  MELO_INFO_STREAM("Controller " << this->getName() << " is reset!");
-  return LuaController::initialize(dt);
+  return callControllerStep("reset",dt);
 }
 
 bool LuaController::preStop() {
-  MELO_INFO_STREAM("Controller " << this->getName() << " is pre-stopped!");
-  return true;
+  return callControllerStep("preStop");
 }
 
 bool LuaController::stop() {
-  MELO_INFO_STREAM("Controller " << this->getName() << " is stopped!");
-  return true;
+  return callControllerStep("stop");
 }
 
 bool LuaController::cleanup() {
-  MELO_INFO_STREAM("Controller " << this->getName() << " is cleaned up!");
-  return true;
+  return callControllerStep("cleanup");
 }
 
 bool LuaController::swap(double dt, const roco::ControllerSwapStateInterfacePtr& swapState) {
-  // Call current class reset / initialize
-  return isInitialized() ? LuaController::reset(dt) : LuaController::initialize(dt);
+  return callControllerStep("swap",dt);
 }
 
 bool LuaController::getSwapState(roco::ControllerSwapStateInterfacePtr& swapState) {
@@ -116,7 +112,7 @@ int LuaController::executeString(const std::string &str) {
 }
 
 bool LuaController::callControllerStep(const std::string& stepname) {
-  MELO_INFO_STREAM("STACK (entry)" << lua_gettop(L));
+//   MELO_INFO_STREAM("STACK (entry)" << lua_gettop(L));
   lua_getglobal(L,stepname.c_str());
   int error = lua_pcall(L,0,1,0);
   if (error != 0) {
@@ -128,12 +124,12 @@ bool LuaController::callControllerStep(const std::string& stepname) {
   if (0==lua_toboolean(L,-1))
     return false;
   lua_pop(L,1);
-  MELO_INFO_STREAM("STACK (exit)" << lua_gettop(L));
+//   MELO_INFO_STREAM("STACK (exit)" << lua_gettop(L));
   return true;
 }
 
 bool LuaController::callControllerStep(const std::string& stepname,double dt) {
-  MELO_INFO_STREAM("STACK (entry)" << lua_gettop(L));
+//   MELO_INFO_STREAM("STACK (entry)" << lua_gettop(L));
   lua_getglobal(L,stepname.c_str());
   lua_pushnumber(L,dt);
   int error = lua_pcall(L,1,1,0);
@@ -145,7 +141,7 @@ bool LuaController::callControllerStep(const std::string& stepname,double dt) {
   }
   if (0==lua_toboolean(L,-1))
     return false;
-  MELO_INFO_STREAM("STACK (exit)" << lua_gettop(L));
+//   MELO_INFO_STREAM("STACK (exit)" << lua_gettop(L));
   return true;
   
 }

@@ -37,7 +37,7 @@ RUN cd ${WORKDIR}/src &&\
     git clone https://github.com/ANYbotics/signal_logger &&\
     git clone https://github.com/ANYbotics/message_logger &&\
     git clone https://github.com/ANYbotics/any_node &&\
-    git clone https://github.com/ANYbotics/variant &&\
+    git clone https://github.com/ANYbotics/variant
 
 RUN cd ${WORKDIR}/src &&\
     git clone https://github.com/haianos/rocoma-sandbox

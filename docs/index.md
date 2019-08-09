@@ -135,13 +135,15 @@ If the controller is running fine, then we can also visualise the (ROS) command 
 docker ps
 ```
 
-![](/home/haianos/anybotics/src/haianos/docs/images/docker-id.png)
+![](images/screen1.png)
 
 Once the `CONTAINER ID` has been found, type:
 
 ```bash
 docker exec -i -t <CONTAINER ID> /bin/bash
 ```
+
+![](images/docker-id.png)
 
 to access to another terminal. From there, we source again and we subscribe to `/scriptctrl_example_exec/LuaGeneric1/cmd` topic:
 
@@ -150,7 +152,9 @@ source ws/devel_isolated/setup.bash
 rostopic echo /scriptctrl_example_exec/LuaGeneric1/cmd
 ```
 
-This visualises the command (`std_msgs/Float64`) sent by the running controller.
+This visualises the command (`std_msgs/Float64`) sent by the running controller, as shown in the following picture
+
+![](images/rostopic-echo.png)
 
 From the main terminal, to close the `Lua` REPL interface type:
 

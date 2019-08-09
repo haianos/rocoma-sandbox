@@ -1,3 +1,3 @@
 # Experiments Sandbox with Rocoma
 
-See `docs/technical-report.md`
+See [docs](http://haianos.com/rocoma-sandbox) (or `docs/` subfolder)

@@ -5,7 +5,7 @@
 from osrf/ros:kinetic-desktop-full-xenial
 
 # enabling sudo
-RUN echo nameserver 134.58.127.1 > /etc/resolve.conf && apt-get update && apt-get -y install sudo lua5.3 liblua5.3-dev wget git ssh unzip doxygen
+RUN echo nameserver 134.58.127.1 > /etc/resolv.conf && apt-get update && apt-get -y install sudo lua5.3 liblua5.3-dev wget git ssh unzip doxygen vim
 
 # defining a user and giving him sudo privileges:
 # ENV = available in dependend Dockerfiles, ARG = not available.

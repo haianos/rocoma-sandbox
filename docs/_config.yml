@@ -1,1 +1,7 @@
+title: rocoma-sandbox
+show_dowloads: true
+description: Minimal doc page for rocoma-sandbox
 theme: jekyll-theme-minimal
+
+plugins:
+ - jekyll-seo-tag

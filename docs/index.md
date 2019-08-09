@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # Technical Report 
 
 *Author: Enea Scioni*

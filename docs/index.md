@@ -48,8 +48,8 @@ Some of the most noticeable advantages are:
 
 
 * Integration by embedding/extending an application instead of integration by communication: following the `ROS` philosophy (mainstream nowadays in Robotics),  integration of software components is done by means of a technological key-enabler such as a communication middleware. In this way, different "nodes" (OS processes) developed in different programming languages/style/etc can interact between each other. However, this solution creates a relevant overhead, in terms of: required computation (e.g., serialising/deserialising), networking issues, latencies, etc. All of these are to be avoided in the context of motion control with strong real-time requirements.  This example shows *language interoperability* as a mean of integrating pieces of software developed in different languages (the target scripting language is `Lua`, the same can be realised in `Python` or other scripting languages);
- * "hot" swap of the controllers and their implementation. When developing a controller in `C++`, it implementation choices are defined at *compile time*. The presented proof-of-concept allows of having a generic controller interface (realised in `C++`) that embed a controller implementation written in `Lua`. In this way, the controller can be written in an interpreted language and certain choices can be taken also at *runtime*, allowing a large degree of reconfigurability. It is possible to think, for example to a "battery" of controllers made in this way, which are loaded-unloaded dynamically, with their implementation changed at *runtime*. This solution ease fast development and testing, but also remote maintenance. No need of (re-)compile the controller, thus no need to "stop" the controller manager to perform a change in the implementation.
- * Introspection with a scripting language (`Lua`) of the controller manager without the need of "communicating" by means of `ROS`. This enables a `REPL` interface with a fully-fledged scripting language that has access (limited, on purpose) to the controller manager facilities. This can be used to automate testing procedure and to define (part of) the application behaviour. 
+ * "hot" swap of the controllers and their implementation. When developing a controller in `C++`, its implementation choices are defined at *compile time*. The presented proof-of-concept allows of having a generic controller interface (realised in `C++`) that embed a controller implementation written in `Lua`. In this way, the controller can be written in an interpreted language and certain choices can be taken also at *runtime*, allowing a large degree of reconfigurability. It is possible to think, for example, of "battery" of controllers made in this way, which are ready to be loaded-unloaded dynamically, with their implementation changed at *runtime*. This solution ease fast development and testing, but also remote maintenance. No need of (re-)compile the controller, thus no need to "stop" the controller manager to perform a change in the implementation.
+ * Introspection with a scripting language (`Lua`) of the controller manager without the need of "communicating" by means of `ROS`. This enables a `REPL` interface with a fully-fledged scripting language that has access (limited, on purpose) to the controller manager facilities. This can be used to automate testing procedure and to define (part of) the application behaviour.  Obviously, this option is not suggested for remote introspection of the controller manager.
 
 All of this ease fast prototyping and  deployment of the robotic applications.
 
@@ -59,7 +59,7 @@ All of this ease fast prototyping and  deployment of the robotic applications.
 
 The demo is provided also as `docker` container. A `Dockerile` can be found in the `docker` subfolder of the project.
 
-To build the container:
+To build the container (this may take few minutes):
 
 ```bash
 docker build -t haianos:any .
@@ -123,11 +123,17 @@ We now switch to the 'LuaGeneric1' controller, a controller container that load 
 > cm.switch('LuaGeneric1')
 ```
 
-Let's check if the controller is active with
+Let's check if the controller is active with:
 
 ```
 > cm.printActive()
 ```
+
+The output will look like:
+
+![](images/printactive.png)
+
+
 
 If the controller is running fine, then we can also visualise the (ROS) command sent over the network. To this end, let's open another terminal and check the `CONTAINER ID` of the running docker image with:
 
@@ -135,15 +141,13 @@ If the controller is running fine, then we can also visualise the (ROS) command 
 docker ps
 ```
 
-![](images/screen1.png)
+![](images/docker-id.png)
 
 Once the `CONTAINER ID` has been found, type:
 
 ```bash
 docker exec -i -t <CONTAINER ID> /bin/bash
 ```
-
-![](images/docker-id.png)
 
 to access to another terminal. From there, we source again and we subscribe to `/scriptctrl_example_exec/LuaGeneric1/cmd` topic:
 
@@ -170,7 +174,9 @@ Prior to launch the application, you may want to modify the file `rosconsole.con
 log4j.logger.ros=INFO #was WARN
 ```
 
-This enables back the `MELO_INFO_STREAM` printouts, disable by default to keep the screen clean for the REPL interface.
+This enables back the `MELO_INFO_STREAM` printouts, which is disabled by default to keep the screen clean for the REPL interface. An example of such an output is shown below:
+
+![](images/log-printout.png)
 
 ### What's happened beyond the screen?
 

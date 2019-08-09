@@ -18,15 +18,17 @@ layout: default
 
 Concretely, the "exercise" will embed a scripting language in the Controller Manager, to handle few operations and to allow the implementation of controllers using a different programming language (and programming paradigms) than the one provided by the `C++` interface.
 
+A demo and it's code is provided in this repository, as well as in  a docker container (a `Dockerfile` is provided).
+
 All of these shows necessary skills for the position of Field Robotics Engineer, for which knowledge of the entire robotics software architecture is a must.
 
 ## Rocoma
 
-In one liner, rocoma is a controller manager that allows to manage controllers, plugins and shared modules between controllers.
+In one liner, `rocoma` is a controller manager that allows to manage controllers, plugins and the `shared modules` between controllers.
 
-Rocoma is developed in `C++11`, and it is strongly header/template-based. This delegates to the compiler to perform optimisation of the generated binaries, and a late choice of the developer for the controller `state`, `command` and the `shared modules` among the controllers, but still at *compilation time*. Because of most of the classes of rocoma library are templated classes, their implementation is fully contained in the headers (`.tpp` estension for separating the implementation). This may lead to a low reconfigurability feature at runtime.
+`rocoma` is developed in `C++11`, and it is strongly header/template-based. This delegates to the compiler to perform optimisation over the generated binaries, and a late choice of the employed `state`, `command` and `shared modules`, but still at *compilation time*. Because of most of the classes of rocoma library are template-based classes, their implementation is fully contained in the header files (`.tpp` extension for separating the implementation). This may lead to a low reconfigurability feature at runtime.
 
-Rocoma makes use of few advanced `C++11` features, such as synchronization primitives as `std::promise` and `std::future`.
+`rocoma` makes use of few advanced `C++11` features, such as synchronization primitives as `std::promise` and `std::future`.
 
 Controller plugins are based on the pattern provided and suggested by `ROS1` (`pluginlib`).
 
@@ -45,15 +47,13 @@ The execution of this exercise starts from the `rocoma_example` available online
 Some of the most noticeable advantages are:
 
 
-* Integration by embedding/extending an application instead of integration by communication: following `ROS` philosophy as mainstream in Robotics,  integration of software components is done by means of a technological key-enabler such as a communication middleware. In this way, different "nodes" (OS processes) developed in different programming languages/style/etc can interact between each other. However, this solution creates a relevant overhead, in terms of required computation (e.g., serialising/deserialising), networking issues, latencies, etc; all of these are to be avoided in the context of motion control with strong real-time requirements.  This example shows *language interoperability* as a mean of integrating pieces of software developed in different languages (the target scripting language is `Lua`, the same can be realised in `Python` or others);
- * "hot" swap of the controllers and their implementation. In `C++`, a controller can be rather generic and its implementation can be changed (also at runtime) by loading a different script. No need of compile the controller, and no need to "stop" the controller manager to perform a change.
- * Introspection with a scripting language (Lua) of the controller manager without the need of "communicating" by means of `ROS`. This enables a `REPL` interface with a fully-fledged scripting language that has access (limited, on purpose) to the controller manager facilities. This can be used to automate testing procedure and to define (part of) the application behaviour. 
+* Integration by embedding/extending an application instead of integration by communication: following the `ROS` philosophy (mainstream nowadays in Robotics),  integration of software components is done by means of a technological key-enabler such as a communication middleware. In this way, different "nodes" (OS processes) developed in different programming languages/style/etc can interact between each other. However, this solution creates a relevant overhead, in terms of: required computation (e.g., serialising/deserialising), networking issues, latencies, etc. All of these are to be avoided in the context of motion control with strong real-time requirements.  This example shows *language interoperability* as a mean of integrating pieces of software developed in different languages (the target scripting language is `Lua`, the same can be realised in `Python` or other scripting languages);
+ * "hot" swap of the controllers and their implementation. When developing a controller in `C++`, it implementation choices are defined at *compile time*. The presented proof-of-concept allows of having a generic controller interface (realised in `C++`) that embed a controller implementation written in `Lua`. In this way, the controller can be written in an interpreted language and certain choices can be taken also at *runtime*, allowing a large degree of reconfigurability. It is possible to think, for example to a "battery" of controllers made in this way, which are loaded-unloaded dynamically, with their implementation changed at *runtime*. This solution ease fast development and testing, but also remote maintenance. No need of (re-)compile the controller, thus no need to "stop" the controller manager to perform a change in the implementation.
+ * Introspection with a scripting language (`Lua`) of the controller manager without the need of "communicating" by means of `ROS`. This enables a `REPL` interface with a fully-fledged scripting language that has access (limited, on purpose) to the controller manager facilities. This can be used to automate testing procedure and to define (part of) the application behaviour. 
 
 All of this ease fast prototyping and  deployment of the robotic applications.
 
 ## Run the demo
-
-
 
 ### Run with Docker
 
@@ -89,7 +89,7 @@ source ws/devel_isolated/setup.bash
 roslaunch scriptctrl_example lscript_example.launch
 ```
 
-The Lua Repl provides a fully-fledged Lua scripting environment, with the access to few controller manager functionalities. Currently, the following are the allowed operations on the control manager:
+The `Lua` REPL provides a fully-fledged `Lua` scripting environment, with the access to few controller manager functionalities. Currently, the following are the allowed operations on the control manager:
 
 ```
 getControllers
@@ -129,11 +129,13 @@ Let's check if the controller is active with
 > cm.printActive()
 ```
 
-If the controller is running fine, then we canalso visualise the (ROS) command sent over the network. To this end, let's open another terminal and check the `CONTAINER ID` of the running docker image with:
+If the controller is running fine, then we can also visualise the (ROS) command sent over the network. To this end, let's open another terminal and check the `CONTAINER ID` of the running docker image with:
 
 ```
 docker ps
 ```
+
+![](/home/haianos/anybotics/src/haianos/docs/images/docker-id.png)
 
 Once the `CONTAINER ID` has been found, type:
 
@@ -150,7 +152,7 @@ rostopic echo /scriptctrl_example_exec/LuaGeneric1/cmd
 
 This visualises the command (`std_msgs/Float64`) sent by the running controller.
 
-From the main terminal, to close the Lua REPL interface type:
+From the main terminal, to close the `Lua` REPL interface type:
 
 ```
 > quit
@@ -168,9 +170,9 @@ This enables back the `MELO_INFO_STREAM` printouts, disable by default to keep t
 
 ### What's happened beyond the screen?
 
-The controller loads a lua script that contains the implementation of the controller. From Lua, it is possible to access to few functionalities of the controller container (in C++), including access to `State`, `Command` and a `ROS` publisher.
+The controller loads a `Lua ` script that contains the implementation of the controller. From `Lua`, it is possible to access to few functionalities of the controller container (in C++), including access to `State`, `Command` and a `ROS` publisher.
 
-The controller (in `LuaGeneric1.lua`) looks like this:
+The controller (in `scriptctrl_example/controllers/LuaGeneric1.lua`) looks like this:
 
 ```lua
 function initialize(dt)
@@ -223,7 +225,7 @@ function swap(dt)
 end
 ```
 
-Of course, it is possible to import `Lua` modules or writing regular `Lua` program.
+Of course, it is possible to import `Lua` modules or writing regular `Lua` programs.
 
-A further development will allow to re-load (or overwrite) the implementation of defined methods, thus being able to stop the controller and change the settings (or the full implementation) of the controller, **without** the need to shutdown the full controller manager.
+Further developments will allow to re-load (or overwrite) the implementation of previously defined controller methods. This enables to stop the controller, change its settings (or modifying full implementation), **without** the need to shutdown the controller manager and thus the robot itself.
 

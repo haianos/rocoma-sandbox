@@ -73,7 +73,7 @@ docker run -it haianos:any
 
 #### 	Troubleshooting
 
-Depending on your network configuration, sometimes docker may have some issues on DSN resolution. This usually happens if you are behind  a company network. Typical symptoms are, during the building phase, the impossibility to fetch `archive.ubuntu.com` or to resolve `github.com` host to download the source code. This happens because docker, for each image created (also a temporal one), takes the default DSN from your host.  A possible fix is to setup `/etc/docker/daemon.json` indicating the DSN available, including a list of fallback addresses (eg, google's `8.8.8.8`)
+Depending on your network configuration, sometimes docker may have some issues on DNS resolution. This usually happens if you are behind  a company network. Typical symptoms are, during the building phase, the impossibility to fetch `archive.ubuntu.com` or to resolve `github.com` host to download the source code. This happens because docker, for each image created (also a temporal one), takes the default DNS from your host.  A possible fix is to setup `/etc/docker/daemon.json` indicating the DNS available, including a list of fallback addresses (eg, google's `8.8.8.8`)
 
 ```json
 {
